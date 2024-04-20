@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class YoutubeProjectApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(YoutubeProjectApplication.class, args);
 	}
 
