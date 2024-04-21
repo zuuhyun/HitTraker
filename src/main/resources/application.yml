@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: youtube-project
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/youtube
+    username: root
+    password: password
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+
+            scope:
+              - email
+              - profile
+
+jwt:
+  issuer:lokiki0319@gmail.com
+  secret_key:study-springboot
+
