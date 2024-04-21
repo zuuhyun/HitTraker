@@ -72,4 +72,9 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public User update(String username) {
+        this.username = username;
+        return this;
+    }
 }

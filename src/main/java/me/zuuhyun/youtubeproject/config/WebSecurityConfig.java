@@ -1,4 +1,4 @@
-package me.zuuhyun.youtubeproject.config;
+/*package me.zuuhyun.youtubeproject.config;
 
 
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,6 @@ public class WebSecurityConfig {
 
 
     private final UserDetailService userService;
-
-
 
 
     @Bean
@@ -63,3 +61,4 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+*/
