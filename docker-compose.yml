@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  mysql:
+    container_name: mysql_local
+    image: mysql:latest
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/initdb.d:/docker-entry-point-initdb.d
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=youtube
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+      - TZ=Asia/Seoul
