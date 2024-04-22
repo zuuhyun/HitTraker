@@ -1,0 +1,43 @@
+package me.zuuhyun.youtubeproject.service;
+//BlogService.java
+
+import lombok.RequiredArgsConstructor;
+import me.zuuhyun.youtubeproject.domain.Video;
+import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
+import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
+import me.zuuhyun.youtubeproject.repository.VideoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@Service
+public class VideoService {
+    private final VideoRepository videoRepository;
+
+    public Video save(AddVideoRequest request) {
+        return videoRepository.save(request.toEntity());
+    }
+
+    public List<Video> findAll() {
+        return videoRepository.findAll();
+    }
+
+    public Video findById(long id) {
+        return videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+    }
+
+    public void delete(long id) {
+        videoRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Video update(long id, UpdateVideoRequest request) {
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        video.update(request.getTitle(), request.getLength(), request.getContent());
+        return video;
+    }
+}
