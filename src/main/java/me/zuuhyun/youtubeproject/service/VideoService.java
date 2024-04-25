@@ -9,6 +9,7 @@ import me.zuuhyun.youtubeproject.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class VideoService {
     public Video update(long id, UpdateVideoRequest request) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
-        video.update(request.getTitle(), request.getContent(), request.getLength());
+        video.update(request.getTitle(), request.getContent(), request.getLength(), LocalDateTime.now());
 
         return video;
     }

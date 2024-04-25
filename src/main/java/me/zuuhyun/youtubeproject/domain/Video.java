@@ -5,7 +5,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,16 +30,26 @@ public class Video {
     @Column(name = "length", nullable = false)
     private Long length;
 
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Builder
-    public Video(String title, String content, Long length) {
+    public Video(String title, String content, Long length, LocalDateTime createdAt) {
         this.title = title;
         this.content = content;
         this.length = length;
+        this.createdAt = createdAt;
     }
 
-    public void update(String title, String content, Long length) {
+    public void update(String title, String content, Long length, LocalDateTime createdAt) {
         this.title = title;
         this.content = content;
         this.length = length;
+        this.updatedAt = createdAt;
     }
 }
