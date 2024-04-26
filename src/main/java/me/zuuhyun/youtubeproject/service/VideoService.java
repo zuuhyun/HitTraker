@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import me.zuuhyun.youtubeproject.domain.Video;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
+import me.zuuhyun.youtubeproject.repository.UserHistoryRepository;
+import me.zuuhyun.youtubeproject.repository.UserRepository;
 import me.zuuhyun.youtubeproject.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 public class VideoService {
     private final VideoRepository videoRepository;
+    private final UserRepository userRepository;
+    private final UserHistoryRepository userHistoryRepository;
 
     public Video save(AddVideoRequest request, String userName) {
         return videoRepository.save(request.toEntity(userName));
@@ -44,11 +48,22 @@ public class VideoService {
     }
 
     @Transactional
-    public Video countView(long id) {
+    public Video updateCountVideoView(long id) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
-        video.countView();
+        video.countTotalView();
         return video;
     }
+
+    @Transactional
+    public Video updateCountAdView(long id, long count) {
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        video.countAdView(count);
+        return video;
+    }
+
+
+
 
 }

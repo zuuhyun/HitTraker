@@ -28,21 +28,24 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "role_type", nullable = false)
+    private Integer roleType;
+
     @Column(name = "password")
     private String password;
 
     @Builder
-    public User(String username, String email, String password, String auth) {
+    public User(String username, String email, String password, Integer roleType) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.roleType = roleType;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("user"));
     }
-
 
     @Override
     public String getUsername() {

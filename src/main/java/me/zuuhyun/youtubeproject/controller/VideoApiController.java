@@ -1,11 +1,14 @@
 package me.zuuhyun.youtubeproject.controller;
 
 import lombok.RequiredArgsConstructor;
+import me.zuuhyun.youtubeproject.domain.UserHistory;
 import me.zuuhyun.youtubeproject.domain.Video;
+import me.zuuhyun.youtubeproject.domain.VideoHistory;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
 import me.zuuhyun.youtubeproject.dto.VideoResponse;
 import me.zuuhyun.youtubeproject.service.VideoService;
+import me.zuuhyun.youtubeproject.service.UserHistoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,7 @@ import java.util.List;
 @RestController
 public class VideoApiController {
     private final VideoService videoService;
+    private final UserHistoryService userHistoryService;
 
     @PostMapping("/api/videos")
     public ResponseEntity<Video> addVideo(@RequestBody AddVideoRequest request, Principal principal) {
@@ -58,9 +62,27 @@ public class VideoApiController {
     }
 
     @PostMapping("/api/videos/play/{id}")
-    public ResponseEntity<Video> countView(@PathVariable long id) {
-        Video updatedVideo = videoService.countView(id);
+    public ResponseEntity<UserHistory> countVideoView(@PathVariable long id, @RequestBody UserHistory request) {
+        //조회수증가
+        videoService.updateCountVideoView(id);
+        UserHistory userHistory;
+        //기존 재생 기록 있는지 조회
+        try{
+            userHistory = userHistoryService.getUserHistory(request.getUserId(), id);
+        }catch (IllegalArgumentException e){
+            userHistory = userHistoryService.saveUserHistory(request.getUserId(), id);
+        }
+        return ResponseEntity.ok()
+                .body(userHistory);
+    }
+
+    @PostMapping("/api/videos/stop/{id}")
+    public ResponseEntity<Video> countAdView(@PathVariable long id, @RequestBody UserHistory request) {
+        userHistoryService.updateViewTime(request.getUserId(), id, request.getViewingTime());
+        long viewing_time = userHistoryService.getUserHistory(request.getUserId(), id).getViewingTime();
+        Video updatedVideo = videoService.updateCountAdView(id, viewing_time/300);
         return ResponseEntity.ok()
                 .body(updatedVideo);
     }
+
 }
