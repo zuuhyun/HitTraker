@@ -27,7 +27,7 @@ public class Video {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "length", nullable = false)
+    @Column(name = "duration", nullable = false)
     private Long length;
 
     @CreatedDate
@@ -38,12 +38,21 @@ public class Video {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "author", nullable = false)
+    private String author;
+
+    @Column(name = "video_total_view", nullable = false)
+    private Long videoTotalView;
+
+
     @Builder
-    public Video(String title, String content, Long length, LocalDateTime createdAt) {
+    public Video(String title, String author, String content, Long length, LocalDateTime createdAt, Long videoTotalView) {
         this.title = title;
+        this.author = author;
         this.content = content;
         this.length = length;
         this.createdAt = createdAt;
+        this.videoTotalView = videoTotalView;
     }
 
     public void update(String title, String content, Long length, LocalDateTime createdAt) {
@@ -52,4 +61,10 @@ public class Video {
         this.length = length;
         this.updatedAt = createdAt;
     }
+
+    public void countView() {
+        this.videoTotalView = getVideoTotalView() + 1;
+    }
+
+
 }

@@ -17,8 +17,8 @@ import java.util.List;
 public class VideoService {
     private final VideoRepository videoRepository;
 
-    public Video save(AddVideoRequest request) {
-        return videoRepository.save(request.toEntity());
+    public Video save(AddVideoRequest request, String userName) {
+        return videoRepository.save(request.toEntity(userName));
     }
 
     public List<Video> findAll() {
@@ -40,6 +40,14 @@ public class VideoService {
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
         video.update(request.getTitle(), request.getContent(), request.getLength(), LocalDateTime.now());
 
+        return video;
+    }
+
+    @Transactional
+    public Video countView(long id) {
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        video.countView();
         return video;
     }
 

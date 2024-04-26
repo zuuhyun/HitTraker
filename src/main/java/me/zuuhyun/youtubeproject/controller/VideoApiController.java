@@ -1,7 +1,6 @@
 package me.zuuhyun.youtubeproject.controller;
 
 import lombok.RequiredArgsConstructor;
-
 import me.zuuhyun.youtubeproject.domain.Video;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,8 +19,8 @@ public class VideoApiController {
     private final VideoService videoService;
 
     @PostMapping("/api/videos")
-    public ResponseEntity<Video> addVideo(@RequestBody AddVideoRequest request) {
-        Video savedVideo = videoService.save(request);
+    public ResponseEntity<Video> addVideo(@RequestBody AddVideoRequest request, Principal principal) {
+        Video savedVideo = videoService.save(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedVideo);
     }
@@ -53,6 +53,13 @@ public class VideoApiController {
     public ResponseEntity<Video> updateVideo(@PathVariable long id,
                                                @RequestBody UpdateVideoRequest request) {
         Video updatedVideo = videoService.update(id, request);
+        return ResponseEntity.ok()
+                .body(updatedVideo);
+    }
+
+    @PostMapping("/api/videos/play/{id}")
+    public ResponseEntity<Video> countView(@PathVariable long id) {
+        Video updatedVideo = videoService.countView(id);
         return ResponseEntity.ok()
                 .body(updatedVideo);
     }
