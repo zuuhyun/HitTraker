@@ -56,6 +56,11 @@ public class User implements UserDetails {
     public String getPassword() {
         return password;
     }
+
+    public int getRoleType(){
+        return roleType;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
