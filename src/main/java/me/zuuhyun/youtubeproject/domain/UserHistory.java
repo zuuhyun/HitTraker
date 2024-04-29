@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -28,18 +29,16 @@ public class UserHistory {
     @Column(name = "viewing_time", nullable = false)
     private Long viewingTime;
 
+    @CreatedDate
     @Column(name = "video_timestamp")
-    private Long videoTimestamp;
+    private LocalDateTime videoTimestamp;
 
     @Builder
-    public UserHistory(Long userId, Long videoId, Long viewingTime, Long videoTimestamp) {
+    public UserHistory(Long userId, Long videoId, Long viewingTime, LocalDateTime videoTimestamp) {
         this.userId = userId;
         this.videoId = videoId;
         this.viewingTime = viewingTime;
         this.videoTimestamp = videoTimestamp;
-    }
-    public void resetviewingTime() {
-        this.viewingTime = 0L;
     }
 
     public void updateViewingTime(Long viewingTime) {

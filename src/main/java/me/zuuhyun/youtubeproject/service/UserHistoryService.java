@@ -6,6 +6,8 @@ import me.zuuhyun.youtubeproject.repository.UserHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @Service
 public class UserHistoryService {
@@ -32,7 +34,7 @@ public class UserHistoryService {
                 .userId(userId)
                 .videoId(videoId)
                 .viewingTime(0L)
-                .videoTimestamp(0L)
+                .videoTimestamp(LocalDateTime.now())
                 .build());
     }
 }

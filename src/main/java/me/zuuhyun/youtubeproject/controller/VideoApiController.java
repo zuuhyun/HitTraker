@@ -3,7 +3,6 @@ package me.zuuhyun.youtubeproject.controller;
 import lombok.RequiredArgsConstructor;
 import me.zuuhyun.youtubeproject.domain.UserHistory;
 import me.zuuhyun.youtubeproject.domain.Video;
-import me.zuuhyun.youtubeproject.domain.VideoHistory;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
 import me.zuuhyun.youtubeproject.dto.VideoResponse;
@@ -15,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+
+import static me.zuuhyun.youtubeproject.util.AdvertisementUtil.generateRandomNum;
 
 @RequiredArgsConstructor
 @RestController
@@ -84,5 +85,4 @@ public class VideoApiController {
         return ResponseEntity.ok()
                 .body(updatedVideo);
     }
-
 }

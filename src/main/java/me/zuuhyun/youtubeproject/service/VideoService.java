@@ -1,13 +1,13 @@
 package me.zuuhyun.youtubeproject.service;
 
 import lombok.RequiredArgsConstructor;
-
 import me.zuuhyun.youtubeproject.domain.Video;
+import me.zuuhyun.youtubeproject.domain.VideoAd;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
-import me.zuuhyun.youtubeproject.repository.UserHistoryRepository;
-import me.zuuhyun.youtubeproject.repository.UserRepository;
-import me.zuuhyun.youtubeproject.repository.VideoRepository;
+import me.zuuhyun.youtubeproject.repository.*;
+import static me.zuuhyun.youtubeproject.util.AdvertisementUtil.generateRandomNum;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +18,8 @@ import java.util.List;
 @Service
 public class VideoService {
     private final VideoRepository videoRepository;
-    private final UserRepository userRepository;
-    private final UserHistoryRepository userHistoryRepository;
+    private final AdvertisementRepository advertisementRepository;
+    private final VideoAdRepository videoAdRepository;
 
     public Video save(AddVideoRequest request, String userName) {
         return videoRepository.save(request.toEntity(userName));
@@ -48,18 +48,24 @@ public class VideoService {
     }
 
     @Transactional
-    public Video updateCountVideoView(long id) {
+    public void updateCountVideoView(long id) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
         video.countTotalView();
-        return video;
     }
 
     @Transactional
     public Video updateCountAdView(long id, long count) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
-        video.countAdView(count);
+        for (int i = 0; i < count; i++){
+            long adId = generateRandomNum(1, advertisementRepository.countAllBy());
+            videoAdRepository.save(VideoAd.builder()
+                    .videoId(id)
+                    .adId(adId)
+                    .createdAt(LocalDateTime.now())
+                    .build());
+        }
         return video;
     }
 
