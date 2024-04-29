@@ -18,7 +18,7 @@
                 <input type="hidden" id="article-id" th:value="${video.id}">
                 <header class="mb-4">
                     <h1 class="fw-bolder mb-1" th:text="${video.title}"></h1>
-                    <div class="text-muted fst-italic mb-2" th:text="|Posted on ${#temporals.format(video.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+                    <div class="text-muted fst-italic mb-2" th:text="|Posted on ${#temporals.format(video.createdAt, 'yyyy-MM-dd HH:mm')} By ${video.author}|"></div>
                 </header>
                 <section class="mb-5">
                     <p class="fs-5 mb-4" th:text="${video.content}"></p>

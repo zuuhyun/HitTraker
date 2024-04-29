@@ -16,9 +16,10 @@ public class AddVideoRequest {
     private Long length;
     private LocalDateTime createdAt;
 
-    public Video toEntity() {
+    public Video toEntity(String author) {
         return Video.builder()
                 .title(title)
+                .author(author)
                 .content(content)
                 .length(length)
                 .createdAt(createdAt)

@@ -13,6 +13,7 @@ public class VideoViewResponse {
     private String title;
     private String content;
     private long length;
+    private String author;
     private LocalDateTime createdAt;
 
     public VideoViewResponse(Video video) {
@@ -21,5 +22,6 @@ public class VideoViewResponse {
         this.content = video.getContent();
         this.length = video.getLength();
         this.createdAt = video.getCreatedAt();
+        this.author = video.getAuthor();
     }
 }

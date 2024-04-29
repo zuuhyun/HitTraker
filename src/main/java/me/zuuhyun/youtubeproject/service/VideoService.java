@@ -35,16 +35,29 @@ public class VideoService {
     }
 
     public void delete(long id) {
-        videoRepository.deleteById(id);
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        authorizeVideoAuthor(video);
+        videoRepository.delete(video);
     }
 
     @Transactional
     public Video update(long id, UpdateVideoRequest request) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+
+        authorizeVideoAuthor(video);
         video.update(request.getTitle(), request.getContent(), request.getLength(), LocalDateTime.now());
 
         return video;
+    }
+
+    private static void authorizeVideoAuthor(Video video) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!video.getAuthor().equals(userName)) {
+            throw new IllegalArgumentException("not authorized");
+        }
     }
 
     @Transactional
@@ -68,8 +81,4 @@ public class VideoService {
         }
         return video;
     }
-
-
-
-
 }
