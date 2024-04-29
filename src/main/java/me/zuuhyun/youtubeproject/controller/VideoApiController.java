@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-import static me.zuuhyun.youtubeproject.util.AdvertisementUtil.generateRandomNum;
-
 @RequiredArgsConstructor
 @RestController
 public class VideoApiController {
