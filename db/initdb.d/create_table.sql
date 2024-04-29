@@ -38,7 +38,6 @@ create table if not exists youtube.video
     updated_at        timestamp       default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     author            varchar(50)                               not null,
     video_total_views bigint unsigned default '0'               null,
-    video_ad_views    bigint unsigned default '0'               null,
     constraint video_ibfk_2
         foreign key (author) references youtube.users (email)
 );
