@@ -81,4 +81,10 @@ public class VideoService {
         }
         return video;
     }
+
+    public long getVideoLength(long id){
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        return video.getLength();
+    }
 }

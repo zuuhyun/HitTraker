@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface UserHistoryRepository extends JpaRepository<UserHistory, Long> {
     Optional<UserHistory> findByUserIdAndVideoId(long userId, long videoId);
+    Optional<UserHistory> findFirstByUserIdAndVideoIdOrderByVideoTimestampDesc(long userid, long videoId);
 }

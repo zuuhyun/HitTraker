@@ -61,13 +61,17 @@ public class VideoApiController {
     }
 
     @PostMapping("/api/videos/play/{id}")
-    public ResponseEntity<UserHistory> countVideoView(@PathVariable long id, @RequestBody UserHistory request) {
-        //조회수증가
+    public ResponseEntity<UserHistory> playVideo(@PathVariable long id, @RequestBody UserHistory request) {
+        /*조회수증가*/
         videoService.updateCountVideoView(id);
         UserHistory userHistory;
-        //기존 재생 기록 있는지 조회
+        /* 1. 기존 재생 기록 있는지 조회
+           2. 없으면 생성 / 다 본 영상이면 새로 생성 */
         try{
             userHistory = userHistoryService.getUserHistory(request.getUserId(), id);
+            if (userHistory.getViewingTime() == videoService.getVideoLength(id)) {
+                userHistory = userHistoryService.saveUserHistory(request.getUserId(), id);
+            }
         }catch (IllegalArgumentException e){
             userHistory = userHistoryService.saveUserHistory(request.getUserId(), id);
         }
@@ -76,10 +80,10 @@ public class VideoApiController {
     }
 
     @PostMapping("/api/videos/stop/{id}")
-    public ResponseEntity<Video> countAdView(@PathVariable long id, @RequestBody UserHistory request) {
-        userHistoryService.updateViewTime(request.getUserId(), id, request.getViewingTime());
+    public ResponseEntity<Video> stopVideo(@PathVariable long id, @RequestBody UserHistory request) {
+        userHistoryService.updateViewTime(request.getUserId(), id, request.getViewingTime(), videoService.getVideoLength(id));
         long viewing_time = userHistoryService.getUserHistory(request.getUserId(), id).getViewingTime();
-        Video updatedVideo = videoService.updateCountAdView(id, viewing_time/300);
+        Video updatedVideo = videoService.updateCountAdView(id, viewing_time/60);
         return ResponseEntity.ok()
                 .body(updatedVideo);
     }

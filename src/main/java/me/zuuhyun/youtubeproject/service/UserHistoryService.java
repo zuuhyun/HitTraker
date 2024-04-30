@@ -15,17 +15,19 @@ public class UserHistoryService {
 
     @Transactional
     public UserHistory getUserHistory(long userId, long videoId) {
-        return userHistoryRepository.findByUserIdAndVideoId(userId, videoId)
+        return userHistoryRepository.findFirstByUserIdAndVideoIdOrderByVideoTimestampDesc(userId, videoId)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + userId + videoId));
     }
 
     @Transactional
-    public UserHistory updateViewTime(long userId, long videoId, long viewTime) {
-        UserHistory userHistory = userHistoryRepository.findByUserIdAndVideoId(userId, videoId)
+    public void updateViewTime(long userId, long videoId, long viewTime, long videoLength) {
+        UserHistory userHistory = userHistoryRepository.findFirstByUserIdAndVideoIdOrderByVideoTimestampDesc(userId, videoId)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + userId + videoId));
-        userHistory.updateViewingTime(viewTime);
-
-        return userHistory;
+        long newViewTime = userHistory.getViewingTime() + viewTime;
+        if (newViewTime > videoLength) {
+            newViewTime = videoLength;
+        }
+        userHistory.updateViewingTime(newViewTime);
     }
 
     @Transactional
@@ -36,5 +38,11 @@ public class UserHistoryService {
                 .viewingTime(0L)
                 .videoTimestamp(LocalDateTime.now())
                 .build());
+    }
+
+    @Transactional
+    public UserHistory getLatestUserHistory(long userId, long videoId) {
+        return userHistoryRepository.findFirstByUserIdAndVideoIdOrderByVideoTimestampDesc(userId, videoId)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + userId + videoId));
     }
 }
