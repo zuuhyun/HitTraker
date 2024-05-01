@@ -83,7 +83,7 @@ public class VideoApiController {
     public ResponseEntity<Video> stopVideo(@PathVariable long id, @RequestBody UserHistory request) {
         userHistoryService.updateViewTime(request.getUserId(), id, request.getViewingTime(), videoService.getVideoLength(id));
         long viewing_time = userHistoryService.getUserHistory(request.getUserId(), id).getViewingTime();
-        Video updatedVideo = videoService.updateCountAdView(id, viewing_time/60);
+        Video updatedVideo = videoService.updateCountAdView(id, viewing_time/180);
         return ResponseEntity.ok()
                 .body(updatedVideo);
     }
