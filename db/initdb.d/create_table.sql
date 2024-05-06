@@ -4,16 +4,6 @@ create table if not exists youtube.advertisement
         primary key
 );
 
-create table if not exists youtube.total_views_count
-(
-    total_views_id    bigint auto_increment
-        primary key,
-    created_at        timestamp default CURRENT_TIMESTAMP null,
-    total_views_day   bigint    default 0                 null,
-    total_views_week  bigint    default 0                 null,
-    total_views_month bigint    default 0                 null
-);
-
 create table if not exists youtube.users
 (
     user_id    int unsigned auto_increment
@@ -97,3 +87,14 @@ create table if not exists youtube.video_ad
 
 create index advertisement_detail_ibfk_2
     on youtube.video_ad (video_id);
+
+create table if not exists youtube.video_statistics
+(
+    video_statistics_id bigint auto_increment
+        primary key,
+    today_total_views   bigint    default 0                 null,
+    video_id            int unsigned                        not null,
+    date                timestamp default CURRENT_TIMESTAMP null,
+    constraint total_views_video_video_id_fk
+        foreign key (video_id) references youtube.video (video_id)
+);
