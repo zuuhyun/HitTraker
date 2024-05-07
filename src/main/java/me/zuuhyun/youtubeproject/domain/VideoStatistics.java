@@ -21,16 +21,16 @@ public class VideoStatistics{
     @Column(name = "video_id", nullable = false)
     private Long videoId;
 
-    @Column(name = "today_total_view", nullable = false)
-    private Long todayTotalView;
+    @Column(name = "today_total_views", nullable = false)
+    private Long todayTotalViews;
 
     @Column(name = "date")
     private LocalDateTime date;
 
     @Builder
-    public VideoStatistics(Long videoId, Long todayTotalView, LocalDateTime date) {
+    public VideoStatistics(Long videoId, Long todayTotalViews, LocalDateTime date) {
         this.videoId = videoId;
-        this.todayTotalView = todayTotalView;
+        this.todayTotalViews = todayTotalViews;
         this.date = date;
     }
 }
