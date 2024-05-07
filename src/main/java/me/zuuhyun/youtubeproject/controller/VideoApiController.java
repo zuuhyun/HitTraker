@@ -70,9 +70,12 @@ public class VideoApiController {
         try{
             userHistory = userHistoryService.getUserHistory(request.getUserId(), id);
             if (userHistory.getViewingTime() == videoService.getVideoLength(id)) {
+                videoService.updateCountVideoView(id);
                 userHistory = userHistoryService.saveUserHistory(request.getUserId(), id);
             }
         }catch (IllegalArgumentException e){
+            /*조회수증가*/
+            videoService.updateCountVideoView(id);
             userHistory = userHistoryService.saveUserHistory(request.getUserId(), id);
         }
         return ResponseEntity.ok()
