@@ -12,6 +12,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -30,23 +31,32 @@ public class VideoStatisticsApiController {
     }
 
     @GetMapping("/api/totalrank/viewcount/week")
-    //public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosWeek()
-      public void getTop5ViewedVideosWeek(){
-        LocalDate localDate = LocalDate.now();
-        Date endDate = Date.valueOf(localDate);
-        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
+    public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosWeek(){
+        LocalDate today = LocalDate.now();
+        Date endDate = Date.valueOf(today);
+        LocalDate oneWeekAgo = today.minusWeeks(1);
         Date startDate = Date.valueOf(oneWeekAgo);
 
-        //List<VideoStatistics> mostViewedVideos = videoStatisticsService.getWeekTotalViews(startDate, endDate);
-        videoStatisticsService.getWeekTotalViews(startDate, endDate);
+        List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getWeekTotalViews(startDate, endDate);
+        List<VideoStatisticsReponse> videoInfoList = new ArrayList<>();
+        for (Map.Entry<Long, Long> entry : top5Videos) {
+            VideoStatisticsReponse videoInfoDto = new VideoStatisticsReponse();
+            videoInfoDto.setVideoId(entry.getKey());
+            videoInfoDto.setTodayTotalViews(entry.getValue());
+            videoInfoDto.setDate(today);
+            videoInfoList.add(videoInfoDto);
+        }
+        return ResponseEntity.ok()
+                .body(videoInfoList);
     }
+
 
     public List<VideoStatisticsReponse> convertToResponse(List<VideoStatistics> statisticsList) {
         List<VideoStatisticsReponse> responses = new ArrayList<>();
         for (VideoStatistics statistics : statisticsList) {
             VideoStatisticsReponse response = new VideoStatisticsReponse();
             response.setVideoId(statistics.getVideoId());
-            response.setDate(statistics.getDate());
+            response.setDate(statistics.getDate().toLocalDate());
             response.setTodayTotalViews(statistics.getTodayTotalViews());
             responses.add(response);
         }
