@@ -30,40 +30,48 @@ public class VideoStatisticsApiController {
                 .body(convertToResponse(mostViewedVideos));
     }
 
+    /* 일주일 조회수 TOP5 */
     @GetMapping("/api/totalrank/viewcount/week")
     public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosWeek(){
-        LocalDate today = LocalDate.now();
-        Date endDate = Date.valueOf(today);
-        LocalDate oneWeekAgo = today.minusWeeks(1);
-        Date startDate = Date.valueOf(oneWeekAgo);
+        Date startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
 
-        List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getWeekTotalViews(startDate, endDate);
-        List<VideoStatisticsReponse> videoInfoList = new ArrayList<>();
-        for (Map.Entry<Long, Long> entry : top5Videos) {
-            VideoStatisticsReponse videoInfoDto = new VideoStatisticsReponse();
-            videoInfoDto.setVideoId(entry.getKey());
-            videoInfoDto.setTodayTotalViews(entry.getValue());
-            videoInfoDto.setDate(today);
-            videoInfoList.add(videoInfoDto);
-        }
         return ResponseEntity.ok()
-                .body(videoInfoList);
+                .body(getTop5ViewedVideos(startDate));
     }
 
+    /* 한달 조회수 TOP5 */
+    @GetMapping("/api/totalrank/viewcount/month")
+    public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosMonth(){
+        Date startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
+
+        return ResponseEntity.ok()
+                .body(getTop5ViewedVideos(startDate));
+    }
 
     public List<VideoStatisticsReponse> convertToResponse(List<VideoStatistics> statisticsList) {
         List<VideoStatisticsReponse> responses = new ArrayList<>();
         for (VideoStatistics statistics : statisticsList) {
             VideoStatisticsReponse response = new VideoStatisticsReponse();
             response.setVideoId(statistics.getVideoId());
-            response.setDate(statistics.getDate().toLocalDate());
+            response.setDate(Date.valueOf(statistics.getDate().toLocalDate()));
             response.setTodayTotalViews(statistics.getTodayTotalViews());
             responses.add(response);
         }
         return responses;
     }
 
-    /* 1일, 1주일, 1달 동안 재생 시간이 긴 동영상 TOP5
-     *  현재 날짜 기준으로 (createdAt) total_playtime_day, total_playtime_week, total_playtime_month 가져오기
-     */
+    public List<VideoStatisticsReponse> getTop5ViewedVideos(Date startDate){
+        Date endDate = java.sql.Date.valueOf(LocalDate.now());
+        List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getRangeTotalViews(startDate, endDate);
+        List<VideoStatisticsReponse> videoInfoList = new ArrayList<>();
+        for (Map.Entry<Long, Long> entry : top5Videos) {
+            VideoStatisticsReponse videoInfoDto = new VideoStatisticsReponse();
+            videoInfoDto.setVideoId(entry.getKey());
+            videoInfoDto.setTodayTotalViews(entry.getValue());
+            videoInfoDto.setDate(endDate);
+            videoInfoList.add(videoInfoDto);
+        }
+
+        return videoInfoList;
+    }
 }

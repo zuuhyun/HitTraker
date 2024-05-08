@@ -2,7 +2,8 @@ package me.zuuhyun.youtubeproject.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDate;
+import java.sql.Date;
+
 
 
 @Setter
@@ -10,5 +11,5 @@ import java.time.LocalDate;
 public class VideoStatisticsReponse {
     private Long videoId;
     private Long todayTotalViews;
-    private LocalDate date;
+    private Date date;
 }

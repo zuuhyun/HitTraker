@@ -18,10 +18,10 @@ public class VideoStatisticsService {
     }
 
     /* 1. 날짜 기준에 맞는 데이터를 가져옴
-     * 2. 데이터 for문을 돌리면서 video_id 갯수를 세면서 기존 시청기록을 누적
+     * 2. 데이터 for문을 돌리고 video_id 개수를 세면서 기존 시청기록을 누적
      * 3. 내림차순으로 정렬 후 상위 5개 return
      * */
-    public List<Map.Entry<Long, Long>> getWeekTotalViews(Date startDate, Date endDate){
+    public List<Map.Entry<Long, Long>> getRangeTotalViews(Date startDate, Date endDate){
         List<VideoStatistics> videoStatistics = videoStatisticsRepository.findVideoStatisticsByDateRange(startDate, endDate);
         HashMap<Long,Long> map = new HashMap<>();
 
