@@ -44,14 +44,20 @@ create table if not exists youtube.video
 
 create table if not exists youtube.balance_accounts
 (
-    balance_accounts_id bigint auto_increment
+    balance_accounts_id    bigint auto_increment
         primary key,
-    user_id             int unsigned                        not null,
-    video_id            int unsigned                        not null,
-    views_settlement    bigint    default 0                 null,
-    ad_views_settlement bigint    default 0                 null,
-    total_settlement    bigint    default 0                 null,
-    created_at          timestamp default CURRENT_TIMESTAMP null,
+    user_id                int unsigned                        not null,
+    video_id               int unsigned                        not null,
+    created_at             timestamp default CURRENT_TIMESTAMP null,
+    video_settlement_day   double    default 0                 null,
+    video_settlement_week  double    default 0                 null,
+    video_settlement_month double    default 0                 null,
+    ad_settlement_day      double    default 0                 null,
+    ad_settlement_week     double    default 0                 null,
+    ad_settlement_month    double    default 0                 null,
+    total_settlement_day   double    default 0                 null,
+    total_settlement_week  double    default 0                 null,
+    total_settlement_month double    default 0                 null,
     constraint user_id
         foreign key (user_id) references youtube.users (user_id),
     constraint video_id
@@ -62,10 +68,10 @@ create table if not exists youtube.user_history
 (
     play_id         int unsigned auto_increment
         primary key,
-    user_id         int unsigned                 null,
-    video_id        int unsigned                 null,
-    viewing_time    int unsigned default '0'     not null,
-    video_timestamp timestamp    default (now()) not null,
+    user_id         int unsigned              null,
+    video_id        int unsigned              null,
+    viewing_time    bigint    default 0       not null,
+    video_timestamp timestamp default (now()) not null,
     constraint play_history_ibfk_1
         foreign key (user_id) references youtube.users (user_id),
     constraint play_history_ibfk_2
@@ -90,11 +96,11 @@ create index advertisement_detail_ibfk_2
 
 create table if not exists youtube.video_statistics
 (
-    video_statistics_id bigint auto_increment
+    video_statistics_id int unsigned auto_increment
         primary key,
-    today_total_views   bigint    default 0                 null,
     video_id            int unsigned                        not null,
     date                timestamp default CURRENT_TIMESTAMP null,
-    constraint total_views_video_video_id_fk
+    today_total_views   bigint    default 0                 null,
+    constraint video_statistics_video_video_id_fk
         foreign key (video_id) references youtube.video (video_id)
 );
