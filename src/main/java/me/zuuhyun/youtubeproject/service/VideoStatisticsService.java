@@ -2,7 +2,6 @@ package me.zuuhyun.youtubeproject.service;
 
 import lombok.RequiredArgsConstructor;
 import me.zuuhyun.youtubeproject.domain.VideoStatistics;
-import me.zuuhyun.youtubeproject.repository.VideoRepository;
 import me.zuuhyun.youtubeproject.repository.VideoStatisticsRepository;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
@@ -12,10 +11,6 @@ import java.util.*;
 @Service
 public class VideoStatisticsService {
     private final VideoStatisticsRepository videoStatisticsRepository;
-
-    public List<VideoStatistics> getTodayTotalViews(Date date){
-        return videoStatisticsRepository.findByDateOrderByTodayTotalViewsDesc(date);
-    }
 
     /* 1. 날짜 기준에 맞는 데이터를 가져옴
      * 2. 데이터 for문을 돌리고 video_id 개수를 세면서 기존 시청기록을 누적
