@@ -87,6 +87,23 @@ public class VideoSettlementService {
         return totalAdViewsPrice;
     }
 
+    public void saveAllVideoStatistics() {
+        //video_id 총 개수
+        int totalVideoCount = videoRepository.countAllBy();
+        for (long id = 6; id <= totalVideoCount; id++){
+            /*todo: todayTotalviews 값 계산 하는 함수 만들기*/
+            long todayTotalViews = 0;
+            videoStatisticsRepository.save(VideoStatistics.builder()
+                    .videoId(id)
+                    .date(LocalDateTime.now())
+                    .todayTotalViews(todayTotalViews)
+                    .build());
+        }
+    }
+
+    public void saveAllBalanceAccount() {
+    }
+
     /*영상정산*/
     public double calculateVideoSettlement(long totalViews){
         double price;
