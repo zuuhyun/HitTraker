@@ -1,7 +1,6 @@
 package me.zuuhyun.youtubeproject.controller;
 
 import lombok.RequiredArgsConstructor;
-import me.zuuhyun.youtubeproject.domain.VideoStatistics;
 import me.zuuhyun.youtubeproject.dto.VideoStatisticsReponse;
 import me.zuuhyun.youtubeproject.service.VideoStatisticsService;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +19,15 @@ public class VideoStatisticsApiController {
     private final VideoStatisticsService videoStatisticsService;
 
     /* 1일 조회수 TOP5 */
-    @GetMapping("/api/totalrank/viewcount/day")
+    @GetMapping("/api/videostat/viewcount/day")
     public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosDay() {
-        LocalDate localDate = LocalDate.now();
-        Date today = Date.valueOf(localDate);
-        List<VideoStatistics> mostViewedVideos = videoStatisticsService.getTodayTotalViews(today);
-
+        Date startDate = java.sql.Date.valueOf(LocalDate.now());
         return ResponseEntity.ok()
-                .body(convertToResponse(mostViewedVideos));
+                .body(getTop5ViewedVideos(startDate));
     }
 
     /* 일주일 조회수 TOP5 */
-    @GetMapping("/api/totalrank/viewcount/week")
+    @GetMapping("/api/videostat/viewcount/week")
     public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosWeek(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
 
@@ -40,24 +36,12 @@ public class VideoStatisticsApiController {
     }
 
     /* 한달 조회수 TOP5 */
-    @GetMapping("/api/totalrank/viewcount/month")
+    @GetMapping("/api/videostat/viewcount/month")
     public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosMonth(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
 
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
-    }
-
-    public List<VideoStatisticsReponse> convertToResponse(List<VideoStatistics> statisticsList) {
-        List<VideoStatisticsReponse> responses = new ArrayList<>();
-        for (VideoStatistics statistics : statisticsList) {
-            VideoStatisticsReponse response = new VideoStatisticsReponse();
-            response.setVideoId(statistics.getVideoId());
-            response.setDate(Date.valueOf(statistics.getDate().toLocalDate()));
-            response.setTodayTotalViews(statistics.getTodayTotalViews());
-            responses.add(response);
-        }
-        return responses;
     }
 
     public List<VideoStatisticsReponse> getTop5ViewedVideos(Date startDate){
@@ -71,7 +55,6 @@ public class VideoStatisticsApiController {
             videoInfoDto.setDate(endDate);
             videoInfoList.add(videoInfoDto);
         }
-
         return videoInfoList;
     }
 }
