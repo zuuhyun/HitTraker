@@ -24,7 +24,13 @@ public class VideoSettlementService {
         Date startDate = getStartDate(endDate, period);
 
         /*비디오 정산 금액*/
-        return calculateVideoSettlement(videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
+        double videoSettlement;
+        try {
+            videoSettlement = calculateVideoSettlement(videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
+        } catch (Exception e) {
+            videoSettlement = 0;
+        }
+        return videoSettlement;
     }
 
     public double getAdSettlement(long id, Period period){
@@ -42,7 +48,6 @@ public class VideoSettlementService {
         for (Map.Entry<Long, Long> entry : map.entrySet()){
             totalAdViewsPrice += calculateAdSettlement(entry.getValue());
         }
-
         return totalAdViewsPrice;
     }
 
