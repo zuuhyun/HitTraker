@@ -62,8 +62,6 @@ public class VideoApiController {
 
     @PostMapping("/api/videos/play/{id}")
     public ResponseEntity<UserHistory> playVideo(@PathVariable long id, @RequestBody UserHistory request) {
-        /*조회수증가*/
-        videoService.updateCountVideoView(id);
         UserHistory userHistory;
         /* 1. 기존 재생 기록 있는지 조회
            2. 없으면 생성 / 다 본 영상이면 새로 생성 */

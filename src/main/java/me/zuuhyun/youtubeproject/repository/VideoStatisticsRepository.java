@@ -1,6 +1,5 @@
 package me.zuuhyun.youtubeproject.repository;
 
-import me.zuuhyun.youtubeproject.domain.VideoAd;
 import me.zuuhyun.youtubeproject.domain.VideoStatistics;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
