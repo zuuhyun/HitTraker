@@ -1,7 +1,7 @@
 package me.zuuhyun.youtubeproject.controller;
 
 import lombok.RequiredArgsConstructor;
-import me.zuuhyun.youtubeproject.dto.VideoStatisticsReponse;
+import me.zuuhyun.youtubeproject.dto.VideoStatisticsResponse;
 import me.zuuhyun.youtubeproject.service.VideoStatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ public class VideoStatisticsApiController {
 
     /* 1일 조회수 TOP5 */
     @GetMapping("/api/videostat/viewcount/day")
-    public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosDay() {
+    public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosDay() {
         Date startDate = java.sql.Date.valueOf(LocalDate.now());
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
@@ -28,7 +28,7 @@ public class VideoStatisticsApiController {
 
     /* 일주일 조회수 TOP5 */
     @GetMapping("/api/videostat/viewcount/week")
-    public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosWeek(){
+    public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosWeek(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
 
         return ResponseEntity.ok()
@@ -37,19 +37,19 @@ public class VideoStatisticsApiController {
 
     /* 한달 조회수 TOP5 */
     @GetMapping("/api/videostat/viewcount/month")
-    public ResponseEntity<List<VideoStatisticsReponse>> getTop5ViewedVideosMonth(){
+    public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosMonth(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
 
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
     }
 
-    public List<VideoStatisticsReponse> getTop5ViewedVideos(Date startDate){
+    public List<VideoStatisticsResponse> getTop5ViewedVideos(Date startDate){
         Date endDate = java.sql.Date.valueOf(LocalDate.now());
         List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getRangeTotalViews(startDate, endDate);
-        List<VideoStatisticsReponse> videoInfoList = new ArrayList<>();
+        List<VideoStatisticsResponse> videoInfoList = new ArrayList<>();
         for (Map.Entry<Long, Long> entry : top5Videos) {
-            VideoStatisticsReponse videoInfoDto = new VideoStatisticsReponse();
+            VideoStatisticsResponse videoInfoDto = new VideoStatisticsResponse();
             videoInfoDto.setVideoId(entry.getKey());
             videoInfoDto.setTodayTotalViews(entry.getValue());
             videoInfoDto.setDate(endDate);
