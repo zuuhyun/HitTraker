@@ -1,14 +1,19 @@
 package me.zuuhyun.youtubeproject.service;
 
 import lombok.RequiredArgsConstructor;
+import me.zuuhyun.youtubeproject.domain.BalanceAccount;
 import me.zuuhyun.youtubeproject.domain.VideoAd;
+import me.zuuhyun.youtubeproject.domain.VideoStatistics;
 import me.zuuhyun.youtubeproject.repository.VideoAdRepository;
+import me.zuuhyun.youtubeproject.repository.VideoRepository;
 import me.zuuhyun.youtubeproject.repository.VideoStatisticsRepository;
+import me.zuuhyun.youtubeproject.repository.BalanceAccountRepository;
 import org.springframework.stereotype.Service;
 import me.zuuhyun.youtubeproject.util.Period;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,28 +21,59 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Service
 public class VideoSettlementService {
-    private final VideoStatisticsRepository videoStatisticsRepository;
+    private final VideoRepository videoRepository;
     private final VideoAdRepository videoAdRepository;
+    private final VideoStatisticsRepository videoStatisticsRepository;
+    private final BalanceAccountRepository balanceAccountRepository;
 
-    public double getVideoSettlement(long id, Period period){
+    public HashMap<String,Double> getSettlementInfo(long id, Period period){
         Date endDate = java.sql.Date.valueOf(LocalDate.now());
         Date startDate = getStartDate(endDate, period);
+        BalanceAccount balanceAccount;
+        double videoSettlement, adSettlement;
 
-        /*비디오 정산 금액*/
-        double videoSettlement;
         try {
-            videoSettlement = calculateVideoSettlement(videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
-        } catch (Exception e) {
-            videoSettlement = 0;
+            balanceAccount = balanceAccountRepository.findByVideoIdAndCreatedAt(id, LocalDateTime.now()).
+                    orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+            videoSettlement = getVideoSettlement(balanceAccount, period);
+            adSettlement = getAdSettlement(balanceAccount, period);
+        } catch (Exception e1) {
+            /*balanceAccount 테이블 생성해주기*/
+            try {
+                videoSettlement = calculateVideoSettlement(videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
+                adSettlement = makeAdStatisticsSettlement(id, startDate, endDate);
+            } catch (Exception e2) {
+                videoSettlement = 0;
+                adSettlement = 0;
+            }
         }
-        return videoSettlement;
+
+        HashMap<String,Double> settlementInfo = new HashMap<>();
+        settlementInfo.put("videoSettlement",videoSettlement);
+        settlementInfo.put("adSettlement",adSettlement);
+        settlementInfo.put("totalSettlement",videoSettlement + adSettlement);
+
+        return settlementInfo;
     }
 
-    public double getAdSettlement(long id, Period period){
-        Date endDate = java.sql.Date.valueOf(LocalDate.now());
-        Date startDate = getStartDate(endDate, period);
+    public double getVideoSettlement(BalanceAccount balanceAccount, Period period){
+        return switch (period) {
+            case DAY -> balanceAccount.getVideoSettlementDay();
+            case WEEK -> balanceAccount.getVideoSettlementWeek();
+            case MONTH -> balanceAccount.getVideoSettlementMonth();
+        };
+    }
 
-        /*video_ad 테이블에서 video)id와 ad_timestamp 기준으로 ad_id를 가져오고 누적 개수를 구한다.*/
+    public double getAdSettlement(BalanceAccount balanceAccount, Period period){
+        return switch (period) {
+            case DAY -> balanceAccount.getAdSettlementDay();
+            case WEEK -> balanceAccount.getAdSettlementWeek();
+            case MONTH -> balanceAccount.getAdSettlementMonth();
+        };
+    }
+
+    public double makeAdStatisticsSettlement(long id, Date startDate, Date endDate){
+        /*video_ad 테이블에서 video_id와 ad_timestamp 기준으로 ad_id를 가져오고 누적 개수를 구한다.*/
         List<VideoAd> videoAdLists = videoAdRepository.findTotalAdIdAndTimestampByVideoIdAndDateRange(id, startDate, endDate);
         HashMap<Long,Long> map = new HashMap<>();
         for (VideoAd videoAd : videoAdLists) {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,20 +22,19 @@ public class VideoSettlementApiController {
     /* 비디오 별 정산금액 아이디를 받고 일간 주간 한달 조회수를 가져오고 조회수별 단가 계산*/
     @GetMapping("/api/videosettle/videos/{id}")
     public ResponseEntity<List<VideoSettlementResponse>> getVideoSettlement(@PathVariable long id) {
+
         /*비디오아이디, 기간을 service에 전달 영상 조회수의 정산 금액을 받음*/
         List<VideoSettlementResponse> videoSettlementResponseList = new ArrayList<>();
         for(Period period : Period.values()) {
-            double videoSettlement = videoSettlementService.getVideoSettlement(id, period);
-            double adSettlement = videoSettlementService.getAdSettlement(id, period);
-            double totalSettlement = videoSettlement + adSettlement;
-
-            VideoSettlementResponse response = new VideoSettlementResponse();
-            response.setPeriod(period.toString());
-            response.setVideoId(id);
-            response.setDate(getPeriodToString(period)); // 날짜 정보 설정 필요
-            response.setVideoSettlement(videoSettlement);
-            response.setAdSettlement(adSettlement);
-            response.setTotalSettlement(totalSettlement);
+            HashMap<String,Double> settlementInfo = videoSettlementService.getSettlementInfo(id,period);
+            VideoSettlementResponse response = VideoSettlementResponse.builder()
+                    .period(period.toString())
+                    .videoId(id)
+                    .date(getPeriodToString(period))
+                    .videoSettlement(settlementInfo.get("videoSettlement"))
+                    .adSettlement(settlementInfo.get("adSettlement"))
+                    .totalSettlement(settlementInfo.get("totalSettlement"))
+                    .build();
             videoSettlementResponseList.add(response);
         }
         return ResponseEntity.ok()
