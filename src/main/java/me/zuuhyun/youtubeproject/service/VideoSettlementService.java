@@ -1,51 +1,54 @@
 package me.zuuhyun.youtubeproject.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.zuuhyun.youtubeproject.domain.BalanceAccount;
+import me.zuuhyun.youtubeproject.domain.User;
+import me.zuuhyun.youtubeproject.domain.Video;
 import me.zuuhyun.youtubeproject.domain.VideoAd;
-import me.zuuhyun.youtubeproject.domain.VideoStatistics;
-import me.zuuhyun.youtubeproject.repository.VideoAdRepository;
-import me.zuuhyun.youtubeproject.repository.VideoRepository;
-import me.zuuhyun.youtubeproject.repository.VideoStatisticsRepository;
-import me.zuuhyun.youtubeproject.repository.BalanceAccountRepository;
+import me.zuuhyun.youtubeproject.repository.*;
 import org.springframework.stereotype.Service;
 import me.zuuhyun.youtubeproject.util.Period;
+import me.zuuhyun.youtubeproject.util.Utils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class VideoSettlementService {
     private final VideoRepository videoRepository;
+    private final UserRepository userRepository;
     private final VideoAdRepository videoAdRepository;
     private final VideoStatisticsRepository videoStatisticsRepository;
     private final BalanceAccountRepository balanceAccountRepository;
 
+    @Transactional
     public HashMap<String,Double> getSettlementInfo(long id, Period period){
-        Date endDate = java.sql.Date.valueOf(LocalDate.now());
-        Date startDate = getStartDate(endDate, period);
+        Date endDate = java.sql.Date.valueOf(LocalDate.now().minusDays(1));
+        Date startDate = Utils.getStartDate(endDate, period);
         BalanceAccount balanceAccount;
         double videoSettlement, adSettlement;
 
         try {
-            balanceAccount = balanceAccountRepository.findByVideoIdAndCreatedAt(id, LocalDateTime.now()).
+            balanceAccount = balanceAccountRepository.findByVideoIdAndCreatedAt(id, LocalDate.now()).
                     orElseThrow(() -> new IllegalArgumentException("not found: " + id));
             videoSettlement = getVideoSettlement(balanceAccount, period);
             adSettlement = getAdSettlement(balanceAccount, period);
         } catch (Exception e1) {
-            /*balanceAccount 테이블 생성해주기*/
             try {
-                videoSettlement = calculateVideoSettlement(videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
-                adSettlement = makeAdStatisticsSettlement(id, startDate, endDate);
+                videoSettlement = calculateVideoSettlement(findTotalViewsByVideoIdAndDateRange(id, startDate, endDate));
+                adSettlement = getTotalAdViewsSettlement(id, startDate, endDate);
             } catch (Exception e2) {
                 videoSettlement = 0;
                 adSettlement = 0;
             }
+            saveDayBalanceAccount(id);
         }
 
         HashMap<String,Double> settlementInfo = new HashMap<>();
@@ -72,9 +75,9 @@ public class VideoSettlementService {
         };
     }
 
-    public double makeAdStatisticsSettlement(long id, Date startDate, Date endDate){
+    public double getTotalAdViewsSettlement(long id, Date startDate, Date endDate){
         /*video_ad 테이블에서 video_id와 ad_timestamp 기준으로 ad_id를 가져오고 누적 개수를 구한다.*/
-        List<VideoAd> videoAdLists = videoAdRepository.findTotalAdIdAndTimestampByVideoIdAndDateRange(id, startDate, endDate);
+        List<VideoAd> videoAdLists = findTotalAdIdAndTimestampByVideoIdAndDateRange(id, startDate, endDate);
         HashMap<Long,Long> map = new HashMap<>();
         for (VideoAd videoAd : videoAdLists) {
             long key = videoAd.getAdId();
@@ -87,25 +90,24 @@ public class VideoSettlementService {
         return totalAdViewsPrice;
     }
 
-    public void saveAllVideoStatistics() {
-        //video_id 총 개수
-        int totalVideoCount = videoRepository.countAllBy();
-        for (long id = 6; id <= totalVideoCount; id++){
-            /*todo: todayTotalviews 값 계산 하는 함수 만들기*/
-            long todayTotalViews = 0;
-            videoStatisticsRepository.save(VideoStatistics.builder()
-                    .videoId(id)
-                    .date(LocalDateTime.now())
-                    .todayTotalViews(todayTotalViews)
-                    .build());
+    public long findTotalViewsByVideoIdAndDateRange(long videoId, Date startDate, Date endDate) {
+        try {
+            return videoStatisticsRepository.findTotalViewsByVideoIdAndDateRange(videoId, startDate, endDate);
+        } catch (Exception e){
+            return 0;
         }
     }
 
-    public void saveAllBalanceAccount() {
+    public List<VideoAd> findTotalAdIdAndTimestampByVideoIdAndDateRange(Long id, Date startDate, Date endDate) {
+        try {
+            return videoAdRepository.findTotalAdIdAndTimestampByVideoIdAndDateRange(id, startDate, endDate);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     /*영상정산*/
-    public double calculateVideoSettlement(long totalViews){
+    public double calculateVideoSettlement(long totalViews) {
         double price;
         if (totalViews >= 100000 && totalViews < 500000) {
             price = 1.1;
@@ -120,7 +122,7 @@ public class VideoSettlementService {
     }
 
     /*광고영상정산*/
-    public double calculateAdSettlement(long totalViews){
+    public double calculateAdSettlement(long totalViews) {
         double price;
         if (totalViews >= 100000 && totalViews < 500000) {
             price = 12;
@@ -134,15 +136,50 @@ public class VideoSettlementService {
         return totalViews * price;
     }
 
-    public Date getStartDate(Date endDate, Period period){
-        Date startDate;
-        if (period == Period.WEEK){
-            startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
-        }else if (period == Period.MONTH){
-            startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
-        }else {/*Period.DAY*/
-            startDate = endDate;
+    /* 조회한 날의 전날 기준으로 일간 주간 월간 정산 테이블 생성*/
+    @Transactional
+    public void saveDayBalanceAccount(long videoId) {
+        Video video = videoRepository.findById(videoId).orElseThrow();
+        Date startDate, endDate;
+        double dayVideoSettlement = 0, weekVideoSettlement = 0, monthVideoSettlement = 0;
+        double dayAdettlement = 0, weekAdsettlement = 0, monthAdSettlement = 0;
+
+
+        String author = video.getAuthor();
+        User user = userRepository.findByEmail(author).orElseThrow();
+        endDate = java.sql.Date.valueOf(LocalDate.now().minusDays(1));
+
+        for (Period period : Period.values()) {
+            startDate = Utils.getStartDate(endDate, period);
+            switch (period) {
+                case DAY:
+                    dayVideoSettlement = calculateVideoSettlement(findTotalViewsByVideoIdAndDateRange(videoId, startDate, endDate));
+                    dayAdettlement = getTotalAdViewsSettlement(videoId, startDate, endDate);
+                    break;
+                case WEEK:
+                    weekVideoSettlement = calculateVideoSettlement(findTotalViewsByVideoIdAndDateRange(videoId, startDate, endDate));
+                    weekAdsettlement = getTotalAdViewsSettlement(videoId, startDate, endDate);
+                    break;
+               case MONTH:
+                   monthVideoSettlement = calculateVideoSettlement(findTotalViewsByVideoIdAndDateRange(videoId, startDate, endDate));
+                   monthAdSettlement = getTotalAdViewsSettlement(videoId, startDate, endDate);
+                   break;
+            }
         }
-        return startDate;
+        log.info("save balance_account videoId: {}", videoId);
+        balanceAccountRepository.save(BalanceAccount.builder()
+                .userId(user.getId())
+                .videoId(videoId)
+                .createdAt(LocalDate.now())
+                .videoSettlementDay(dayVideoSettlement)
+                .videoSettlementWeek(weekVideoSettlement)
+                .videoSettlementMonth(monthVideoSettlement)
+                .adSettlementDay(dayAdettlement)
+                .adSettlementWeek(weekAdsettlement)
+                .adSettlementMonth(monthAdSettlement)
+                .totalSettlementDay(dayVideoSettlement+dayAdettlement)
+                .totalSettlementWeek(weekVideoSettlement+weekAdsettlement)
+                .totalSettlementMonth(monthVideoSettlement+monthAdSettlement)
+                .build());
     }
 }

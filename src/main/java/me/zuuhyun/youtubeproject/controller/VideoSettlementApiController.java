@@ -43,7 +43,7 @@ public class VideoSettlementApiController {
 
     public String getPeriodToString(Period period) {
         String startDate;
-        String endDate = java.sql.Date.valueOf(LocalDate.now()).toString();
+        String endDate = java.sql.Date.valueOf(LocalDate.now().minusDays(1)).toString();
         if (period.toString().equals("WEEK")) {
             startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1)).toString();
         } else if (period.toString().equals("MONTH")) {
