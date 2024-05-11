@@ -21,7 +21,7 @@ public class VideoStatisticsApiController {
     /* 1일 조회수 TOP5 */
     @GetMapping("/api/videostat/viewcount/day")
     public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosDay() {
-        Date startDate = java.sql.Date.valueOf(LocalDate.now());
+        Date startDate = java.sql.Date.valueOf(LocalDate.now().minusDays(1));
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
     }
@@ -30,7 +30,6 @@ public class VideoStatisticsApiController {
     @GetMapping("/api/videostat/viewcount/week")
     public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosWeek(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
-
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
     }
@@ -39,14 +38,13 @@ public class VideoStatisticsApiController {
     @GetMapping("/api/videostat/viewcount/month")
     public ResponseEntity<List<VideoStatisticsResponse>> getTop5ViewedVideosMonth(){
         Date startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
-
         return ResponseEntity.ok()
                 .body(getTop5ViewedVideos(startDate));
     }
 
     public List<VideoStatisticsResponse> getTop5ViewedVideos(Date startDate){
-        Date endDate = java.sql.Date.valueOf(LocalDate.now());
-        List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getRangeTotalViews(startDate, endDate);
+        Date endDate = java.sql.Date.valueOf(LocalDate.now().minusDays(1));
+        List<Map.Entry<Long, Long>> top5Videos = videoStatisticsService.getTop5ViewsVideos(startDate, endDate);
         List<VideoStatisticsResponse> videoInfoList = new ArrayList<>();
         for (Map.Entry<Long, Long> entry : top5Videos) {
             VideoStatisticsResponse videoInfoDto = new VideoStatisticsResponse();
