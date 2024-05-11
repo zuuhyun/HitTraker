@@ -42,7 +42,7 @@ create table if not exists youtube.video
         foreign key (author) references youtube.users (email)
 );
 
-create table if not exists youtube.balance_accounts
+create table if not exists youtube.balance_account
 (
     balance_accounts_id    bigint auto_increment
         primary key,

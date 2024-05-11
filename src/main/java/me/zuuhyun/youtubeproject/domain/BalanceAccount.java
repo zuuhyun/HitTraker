@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
@@ -28,7 +28,7 @@ public class BalanceAccount {
 
     @CreatedDate
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "video_settlement_day")
     private Double videoSettlementDay;
@@ -54,11 +54,11 @@ public class BalanceAccount {
     @Column(name = "total_settlement_week")
     private Double totalSettlementWeek;
 
-    @Column(name = "total_settle_month")
+    @Column(name = "total_settlement_month")
     private Double totalSettlementMonth;
 
     @Builder
-    public BalanceAccount(Long userId, Long videoId, LocalDateTime createdAt, Double videoSettlementDay, Double videoSettlementWeek, Double videoSettlementMonth, Double adSettlementDay, Double adSettlementWeek, Double adSettlementMonth, Double totalSettlementDay, Double totalSettlementWeek, Double totalSettlementMonth) {
+    public BalanceAccount(Long userId, Long videoId, LocalDate createdAt, Double videoSettlementDay, Double videoSettlementWeek, Double videoSettlementMonth, Double adSettlementDay, Double adSettlementWeek, Double adSettlementMonth, Double totalSettlementDay, Double totalSettlementWeek, Double totalSettlementMonth) {
         this.userId = userId;
         this.videoId = videoId;
         this.createdAt = createdAt;
