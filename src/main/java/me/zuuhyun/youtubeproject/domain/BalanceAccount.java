@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
@@ -28,48 +29,28 @@ public class BalanceAccount {
 
     @CreatedDate
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
-    @Column(name = "video_settlement_day")
-    private Double videoSettlementDay;
+    @Column(name = "date")
+    private LocalDate date;
 
-    @Column(name = "video_settlement_week")
-    private Double  videoSettlementWeek;
+    @Column(name = "video_settlement")
+    private Long videoSettlement;
 
-    @Column(name = "video_settlement_month")
-    private Double videoSettlementMonth;
+    @Column(name = "ad_settlement")
+    private Long adSettlement;
 
-    @Column(name = "ad_settlement_day")
-    private Double adSettlementDay;
-
-    @Column(name = "ad_settlement_week")
-    private Double adSettlementWeek;
-
-    @Column(name = "ad_settlement_month")
-    private Double adSettlementMonth;
-
-    @Column(name = "total_settlement_day")
-    private Double totalSettlementDay;
-
-    @Column(name = "total_settlement_week")
-    private Double totalSettlementWeek;
-
-    @Column(name = "total_settlement_month")
-    private Double totalSettlementMonth;
+    @Column(name = "total_settlement")
+    private Long totalSettlement;
 
     @Builder
-    public BalanceAccount(Long userId, Long videoId, LocalDate createdAt, Double videoSettlementDay, Double videoSettlementWeek, Double videoSettlementMonth, Double adSettlementDay, Double adSettlementWeek, Double adSettlementMonth, Double totalSettlementDay, Double totalSettlementWeek, Double totalSettlementMonth) {
+    public BalanceAccount(Long userId, Long videoId, LocalDateTime createdAt, LocalDate date, Long videoSettlement, Long adSettlement, Long totalSettlement) {
         this.userId = userId;
         this.videoId = videoId;
         this.createdAt = createdAt;
-        this.videoSettlementDay = videoSettlementDay;
-        this.videoSettlementWeek = videoSettlementWeek;
-        this.videoSettlementMonth = videoSettlementMonth;
-        this.adSettlementDay = adSettlementDay;
-        this.adSettlementWeek = adSettlementWeek;
-        this.adSettlementMonth = adSettlementMonth;
-        this.totalSettlementDay = totalSettlementDay;
-        this.totalSettlementWeek = totalSettlementWeek;
-        this.totalSettlementMonth = totalSettlementMonth;
+        this.date = date;
+        this.videoSettlement = videoSettlement;
+        this.adSettlement = adSettlement;
+        this.totalSettlement = totalSettlement;
     }
 }
