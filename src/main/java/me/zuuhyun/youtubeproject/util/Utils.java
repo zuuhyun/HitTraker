@@ -11,12 +11,12 @@ public class Utils {
         return start + secureRandom.nextInt(end);
     }
 
-    public static Date getStartDate(Date endDate, Period period){
-        Date startDate;
+    public static LocalDate getStartDate(LocalDate endDate, Period period){
+        LocalDate startDate;
         if (period == Period.WEEK){
-            startDate = java.sql.Date.valueOf(LocalDate.now().minusWeeks(1));
+            startDate = LocalDate.now().minusWeeks(1);
         }else if (period == Period.MONTH){
-            startDate = java.sql.Date.valueOf(LocalDate.now().minusMonths(1));
+            startDate = LocalDate.now().minusMonths(1);
         }else {/*Period.DAY*/
             startDate = endDate;
         }
