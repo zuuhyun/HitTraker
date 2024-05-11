@@ -11,7 +11,7 @@ public class VideoSettlementResponse {
     private String period;
     private Long videoId;
     private String date;
-    private Double videoSettlement;
-    private Double adSettlement;
-    private Double totalSettlement;
+    private Long videoSettlement;
+    private Long adSettlement;
+    private Long totalSettlement;
 }

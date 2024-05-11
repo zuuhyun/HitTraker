@@ -22,11 +22,9 @@ public class VideoSettlementApiController {
     /* 비디오 별 정산금액 아이디를 받고 일간 주간 한달 조회수를 가져오고 조회수별 단가 계산*/
     @GetMapping("/api/videosettle/videos/{id}")
     public ResponseEntity<List<VideoSettlementResponse>> getVideoSettlement(@PathVariable long id) {
-
-        /*비디오아이디, 기간을 service에 전달 영상 조회수의 정산 금액을 받음*/
         List<VideoSettlementResponse> videoSettlementResponseList = new ArrayList<>();
         for(Period period : Period.values()) {
-            HashMap<String,Double> settlementInfo = videoSettlementService.getSettlementInfo(id,period);
+            HashMap<String,Long> settlementInfo = videoSettlementService.getSettlement(id,period);
             VideoSettlementResponse response = VideoSettlementResponse.builder()
                     .period(period.toString())
                     .videoId(id)
