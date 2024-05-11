@@ -6,7 +6,7 @@ import me.zuuhyun.youtubeproject.domain.VideoAd;
 import me.zuuhyun.youtubeproject.dto.AddVideoRequest;
 import me.zuuhyun.youtubeproject.dto.UpdateVideoRequest;
 import me.zuuhyun.youtubeproject.repository.*;
-import static me.zuuhyun.youtubeproject.util.AdvertisementUtil.generateRandomNum;
+import static me.zuuhyun.youtubeproject.util.Utils.generateRandomNum;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
