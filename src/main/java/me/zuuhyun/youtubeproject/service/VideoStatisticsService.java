@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import me.zuuhyun.youtubeproject.domain.UserHistory;
 import me.zuuhyun.youtubeproject.domain.VideoStatistics;
 import me.zuuhyun.youtubeproject.repository.UserHistoryRepository;
-import me.zuuhyun.youtubeproject.repository.VideoRepository;
 import me.zuuhyun.youtubeproject.repository.VideoStatisticsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,6 @@ public class VideoStatisticsService {
         }
         return totalViews;
     }
-
     /*videoStatistics 테이블 생성*/
     @Transactional
     public void saveDayVideoStatistics() {

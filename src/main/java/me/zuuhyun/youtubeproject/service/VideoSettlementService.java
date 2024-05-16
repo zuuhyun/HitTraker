@@ -79,6 +79,7 @@ public class VideoSettlementService {
                     .videoId(videoId)
                     .videoSettlement((long)videoSettlement)
                     .adSettlement((long)totalAdSettlement)
+                    .date(date)
                     .totalSettlement((long)(videoSettlement+totalAdSettlement))
                     .build());
         }
