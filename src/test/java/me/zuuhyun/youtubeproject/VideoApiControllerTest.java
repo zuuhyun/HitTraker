@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +61,8 @@ class VideoApiControllerTest {
         final String title = "title";
         final String content = "content";
         final long length = 1234;
-        final AddVideoRequest userRequest = new AddVideoRequest(title,content,length);
+        final LocalDateTime createdAt = LocalDateTime.now();
+        final AddVideoRequest userRequest = new AddVideoRequest(title,content,length,createdAt);
 
         final String requestBody = objectMapper.writeValueAsString(userRequest);
 

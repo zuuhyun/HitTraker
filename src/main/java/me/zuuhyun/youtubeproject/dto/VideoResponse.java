@@ -8,10 +8,12 @@ public class VideoResponse {
     private final String title;
     private final String content;
     private final Long length;
+    private final Long totalView;
 
     public VideoResponse(Video video) {
         this.title = video.getTitle();
         this.content = video.getContent();
         this.length = video.getLength();
+        this.totalView = video.getVideoTotalView();
     }
 }
